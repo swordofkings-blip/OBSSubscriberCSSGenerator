@@ -213,17 +213,131 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- プリセット保存・復元機能のロジック ---
 
   /**
-   * @title プリセット保存状況のチェック
-   * @description 各スロットにセーブデータがあるかを調べ、緑のドットインジケータを更新します。
+   * @title プリセット保存状況のチェックとプレビュー適用
+   * @description 各スロットにセーブデータがあるかを調べ、緑のドットインジケータと、保存されたデザインスタイルのプレビューをボタン文字に適用します。
    */
   function checkPresetStorage() {
     slotButtons.forEach(btn => {
       const slot = btn.dataset.slot;
       const data = localStorage.getItem(`obs_css_preset_${slot}`);
+      const previewSpan = btn.querySelector('.slot-preview');
+      
+      if (!previewSpan) return;
+
       if (data) {
         btn.classList.add('has-data');
+        try {
+          const parsed = JSON.parse(data);
+          
+          // --- プレビュー用スタイルの適用 ---
+          
+          // 1. フォントの設定
+          let family = parsed.fontFamily || 'sans-serif';
+          if (family === 'custom') {
+            family = parsed.customFont ? `"${parsed.customFont}"` : 'sans-serif';
+            // ボタンプレビュー表示用にもGoogle Fontsを動的に読み込む
+            if (parsed.customFont) {
+              const fontNameForUrl = parsed.customFont.replace(/\s+/g, '+');
+              const linkId = `gfont-slot-${slot}`;
+              let link = document.getElementById(linkId);
+              if (!link) {
+                link = document.createElement('link');
+                link.id = linkId;
+                link.rel = 'stylesheet';
+                link.href = `https://fonts.googleapis.com/css2?family=${fontNameForUrl}:wght@400;700;900&display=swap`;
+                document.head.appendChild(link);
+              }
+            }
+          }
+          previewSpan.style.fontFamily = `${family}, sans-serif`;
+          previewSpan.style.fontWeight = parsed.fontWeight || '700';
+
+          // 2. 縁取り幅のスケールダウン計算
+          // 18: ボタン枠内に文字（1〜5）がはみ出さずに綺麗に収まるプレビューフォントサイズ (18px)
+          const previewFontSize = 18; 
+          const originalFontSize = parseFloat(parsed.fontSize) || 48;
+          const scale = previewFontSize / originalFontSize;
+          const originalStrokeWidth = parseInt(parsed.textStrokeWidth, 10) || 0;
+          
+          // 縮小された太さを計算（最小0.5px、最大2px程度にクリップして文字潰れを防止）
+          let strokeWidth = 0;
+          if (originalStrokeWidth > 0) {
+            strokeWidth = originalStrokeWidth * scale;
+            if (strokeWidth < 0.5) strokeWidth = 0.5;
+            if (strokeWidth > 2) strokeWidth = 2;
+          }
+          const strokeColor = parsed.textStrokeColor || '#000000';
+
+          // 3. 色とグラデーションの設定
+          if (parsed.colorType === 'solid') {
+            const color = parsed.fontColor || '#ffffff';
+            previewSpan.style.color = color;
+            previewSpan.style.backgroundImage = 'none';
+            previewSpan.style.webkitBackgroundClip = 'unset';
+            previewSpan.style.backgroundClip = 'unset';
+            previewSpan.style.webkitTextFillColor = 'unset';
+            
+            // 縮小版 text-shadow の適用（プレビュー用は処理軽減のため4方向で簡略化）
+            if (strokeWidth > 0) {
+              const wVal = strokeWidth.toFixed(1);
+              previewSpan.style.textShadow = `
+                ${wVal}px ${wVal}px 0 ${strokeColor},
+                -${wVal}px ${wVal}px 0 ${strokeColor},
+                ${wVal}px -${wVal}px 0 ${strokeColor},
+                -${wVal}px -${wVal}px 0 ${strokeColor}
+              `.trim().replace(/\s+/g, ' ');
+            } else {
+              previewSpan.style.textShadow = 'none';
+            }
+            previewSpan.style.filter = 'none';
+          } else {
+            // グラデーションの場合
+            const gradStart = parsed.gradientColorStart || '#ec4899';
+            const gradEnd = parsed.gradientColorEnd || '#3b82f6';
+            const gradAngle = parsed.gradientAngle || '135';
+            
+            previewSpan.style.color = 'transparent';
+            previewSpan.style.backgroundImage = `linear-gradient(${gradAngle}deg, ${gradStart}, ${gradEnd})`;
+            previewSpan.style.webkitBackgroundClip = 'text';
+            previewSpan.style.backgroundClip = 'text';
+            previewSpan.style.webkitTextFillColor = 'transparent';
+            previewSpan.style.textShadow = 'none';
+            
+            // グラデーション時の縁取り（処理軽減と見栄えのため4方向のdrop-shadowで簡略化）
+            if (strokeWidth > 0) {
+              const shadows = [];
+              const steps = 4;
+              for (let i = 0; i < steps; i++) {
+                const angle = (i * 2 * Math.PI) / steps;
+                const x = (Math.cos(angle) * strokeWidth).toFixed(1);
+                const y = (Math.sin(angle) * strokeWidth).toFixed(1);
+                shadows.push(`drop-shadow(${x}px ${y}px 0px ${strokeColor})`);
+              }
+              previewSpan.style.filter = shadows.join(' ');
+            } else {
+              previewSpan.style.filter = 'none';
+            }
+          }
+        } catch (e) {
+          console.error(`スロット ${slot} のプレビュー適用に失敗しました:`, e);
+        }
       } else {
         btn.classList.remove('has-data');
+        // スタイルをデフォルトにリセット
+        previewSpan.style.color = '';
+        previewSpan.style.fontFamily = '';
+        previewSpan.style.fontWeight = '';
+        previewSpan.style.backgroundImage = '';
+        previewSpan.style.webkitBackgroundClip = '';
+        previewSpan.style.backgroundClip = '';
+        previewSpan.style.webkitTextFillColor = '';
+        previewSpan.style.textShadow = '';
+        previewSpan.style.filter = '';
+        
+        // Google Fontsの動的リンクがあれば削除
+        const linkId = `gfont-slot-${slot}`;
+        const link = document.getElementById(linkId);
+        if (link) link.remove();
       }
     });
   }
@@ -285,10 +399,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     localStorage.setItem(`obs_css_preset_${selectedSlot}`, JSON.stringify(presetData));
 
-    // ボタンの緑ドット更新とロードボタンの有効化
-    const activeBtn = document.querySelector(`.slot-btn[data-slot="${selectedSlot}"]`);
-    if (activeBtn) activeBtn.classList.add('has-data');
-    
+    // プレビューと緑ドット、およびロードボタンの有効化状態を更新
+    checkPresetStorage();
     loadPresetBtn.disabled = false;
     const dateStr = new Date(presetData.saveTime).toLocaleString('ja-JP');
     presetStatus.textContent = `スロット ${selectedSlot} に現在のデザインを保存しました！ (${dateStr})`;

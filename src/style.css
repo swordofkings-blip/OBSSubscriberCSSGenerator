@@ -432,3 +432,13 @@ input[type="color"] {
   background-color: #10b981; /* 鮮やかな緑色（データあり） */
   border-radius: 50%;
 }
+
+/* セーブスロット内のプレビュー文字用基本スタイル */
+.slot-preview {
+  display: inline-block;
+  font-size: 18px; /* スロットボタンの枠に収まるサイズ */
+  line-height: 1;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  pointer-events: none; /* ボタン自体のクリック動作を妨げない */
+}
