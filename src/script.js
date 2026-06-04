@@ -70,6 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const shareStatus = document.getElementById('shareStatus');
   
   let selectedSlot = null; // 選択中のスロット番号 (1〜5)
+  let previewTimer = null; // 10秒ごとのプレビュー自動更新タイマー
+  let isUserEditingPreview = false; // ユーザーが手動でプレビュー内容を変更・介入したかのフラグ
 
   // Google Fonts 動的インポート用スタイルタグ（プレビュー用）
   const fontLoaderStyle = document.createElement('style');
@@ -78,13 +80,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // フォントの再読み込みを制限するためのキャッシュ用変数
   let lastLoadedFont = '';
 
+  // 起動時の初期ランダム登録者数（3〜6桁）の自動セット
+  const initialRandomVal = generateRandomSubscribers();
+  previewTextInput.value = initialRandomVal;
+  previewTarget.textContent = initialRandomVal;
+
   // 初期値の同期
   updateValBadges();
   generateCSS();
 
+  // 10秒ごとの自動プレビュー更新タイマーを開始
+  startPreviewTimer();
+
   // イベントリスナーの登録
+  // ユーザーが手動入力（または入力欄にフォーカス）した場合は、お節介な自動更新タイマーを停止させる
   previewTextInput.addEventListener('input', () => {
+    stopPreviewTimer();
     previewTarget.textContent = previewTextInput.value;
+  });
+  previewTextInput.addEventListener('focus', () => {
+    stopPreviewTimer();
   });
 
   // 色タイプの切り替え制御
@@ -469,6 +484,9 @@ document.addEventListener('DOMContentLoaded', () => {
       updateValBadges();
       generateCSS();
 
+      // ロードされたデザインを固定するため、プレビューの自動更新を停止
+      stopPreviewTimer();
+
       showToast(`スロット ${selectedSlot} からデザインをロードしました！`, 'success');
       const dateStr = new Date(parsed.saveTime).toLocaleString('ja-JP');
       presetStatus.textContent = `スロット ${selectedSlot} : 保存データあり (${dateStr})`;
@@ -584,6 +602,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // スタイルバッジとCSSの再構築
       updateValBadges();
       generateCSS();
+
+      // インポートされたデザインを固定するため、プレビューの自動更新を停止
+      stopPreviewTimer();
 
       showToast('デザイン設定を正常に読み込みました！', 'success');
       shareCodeInput.value = ''; // 読み込み完了後、入力欄をクリア
@@ -1001,5 +1022,48 @@ ${keyframesCss}
         toast.remove();
       });
     }, 3000);
+  }
+
+  /**
+   * @title ランダムな登録者数ダミー数値の生成
+   * @description 3桁(100)から6桁(999,999)の範囲のランダムな整数を生成します。
+   * @returns {number} 3〜6桁の整数
+   */
+  function generateRandomSubscribers() {
+    const min = 100; // 3桁表示の最小値（登録者数表示の検証用）
+    const max = 999999; // 6桁表示の最大値（登録者数表示の検証用）
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  /**
+   * @title プレビュー自動更新タイマーの開始
+   * @description 10秒ごとにランダムな数値（3〜6桁）を生成してプレビューを動的に切り替えます。
+   */
+  function startPreviewTimer() {
+    // 10000: 10秒周期（10秒ごと）で登録者数のプレビュー数値を自動更新するためのミリ秒数
+    previewTimer = setInterval(() => {
+      if (isUserEditingPreview) {
+        clearInterval(previewTimer);
+        return;
+      }
+      const randomVal = generateRandomSubscribers();
+      previewTextInput.value = randomVal;
+      previewTarget.textContent = randomVal;
+      
+      // アニメーション等の再適用のためCSS生成を実行する
+      generateCSS();
+    }, 10000);
+  }
+
+  /**
+   * @title プレビュー自動更新タイマーの停止
+   * @description ユーザー操作（手動入力、プリセット読込、インポート）が検知された際に自動更新を永久停止します。
+   */
+  function stopPreviewTimer() {
+    isUserEditingPreview = true;
+    if (previewTimer) {
+      clearInterval(previewTimer);
+      previewTimer = null;
+    }
   }
 });
