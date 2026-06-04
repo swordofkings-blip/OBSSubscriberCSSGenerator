@@ -442,3 +442,65 @@ input[type="color"] {
   transition: all 0.2s ease;
   pointer-events: none; /* ボタン自体のクリック動作を妨げない */
 }
+
+/* トースト通知コンテナ */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+/* トースト個別スタイル（ダークグラスモーフィズム） */
+.toast {
+  background: rgba(19, 27, 46, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 14px 22px;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-main);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 280px;
+  max-width: 400px;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 成功時の緑のインジケータライン */
+.toast.success {
+  border-left: 4px solid #10b981; 
+}
+
+/* エラー時の赤のインジケータライン */
+.toast.error {
+  border-left: 4px solid #ef4444; 
+}
+
+/* 警告時のオレンジのインジケータライン */
+.toast.warning {
+  border-left: 4px solid #f59e0b; 
+}
+
+.toast-icon {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

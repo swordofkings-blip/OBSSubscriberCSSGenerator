@@ -149,7 +149,8 @@
 
             <div class="form-group">
               <label for="fontFamily">フォントの種類</label>
-              <select id="fontFamily" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--border-radius-md); padding: 12px; font-family: inherit;">
+              <select id="fontFamily"
+                style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--border-radius-md); padding: 12px; font-family: inherit;">
                 <option value="sans-serif">ゴシック体 (sans-serif)</option>
                 <option value="serif">明朝体 (serif)</option>
                 <option value="'Outfit'">Outfit (英語おすすめ)</option>
@@ -157,16 +158,22 @@
               </select>
 
               <!-- Google Fonts 手順ガイド -->
-              <div id="googleFontsGuide" style="display: none; background: rgba(236, 72, 153, 0.08); border-left: 4px solid var(--accent-secondary); padding: 16px; border-radius: 4px var(--border-radius-md) var(--border-radius-md) 4px; font-size: 13px; line-height: 1.6; color: var(--text-primary); margin-top: 12px;">
+              <div id="googleFontsGuide"
+                style="display: none; background: rgba(236, 72, 153, 0.08); border-left: 4px solid var(--accent-secondary); padding: 16px; border-radius: 4px var(--border-radius-md) var(--border-radius-md) 4px; font-size: 13px; line-height: 1.6; color: var(--text-primary); margin-top: 12px;">
                 <strong>👉 Google Fonts からフォント名を適用する手順（推奨）：</strong>
                 <ol style="margin-left: 20px; margin-top: 6px; display: flex; flex-direction: column; gap: 6px;">
-                  <li><a href="https://fonts.google.com/?preview.text=1234567890" target="_blank" rel="noopener" style="color: var(--accent-secondary); font-weight: bold; text-decoration: underline;">Google Fonts（外部サイト）</a> を開きます。※「1234567890」が自動入力されたページが開きます。</li>
+                  <li><a href="https://fonts.google.com/?preview.text=1234567890" target="_blank" rel="noopener"
+                      style="color: var(--accent-secondary); font-weight: bold; text-decoration: underline;">Google
+                      Fonts（外部サイト）</a> を開きます。※「1234567890」が自動入力されたページが開きます。</li>
                   <li>好みのフォントが見つかったら、そのフォント名（リンクになっている部分）を<strong>右クリック ＞ 「リンクのアドレスをコピー」</strong>します。</li>
-                  <li>コピーしたURLを下の「フォント名またはURLを入力」欄に<strong>そのまま貼り付け（ペースト）</strong>してください。URLから自動的にフォント名（例: <code style="background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 4px; font-family: monospace;">Playfair Display</code>）が抽出されます！</li>
+                  <li>コピーしたURLを下の「フォント名またはURLを入力」欄に<strong>そのまま貼り付け（ペースト）</strong>してください。URLから自動的にフォント名（例: <code
+                      style="background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 4px; font-family: monospace;">Playfair Display</code>）が抽出されます！
+                  </li>
                 </ol>
               </div>
 
-              <input type="text" id="customFont" placeholder="例: Noto Sans JP または コピーしたURL" style="display: none; margin-top: 8px;">
+              <input type="text" id="customFont" placeholder="例: Noto Sans JP または コピーしたURL"
+                style="display: none; margin-top: 8px;">
             </div>
 
             <!-- 縁取り（袋文字） -->
@@ -274,17 +281,24 @@
             <button id="savePresetBtn" class="btn" style="flex: 1;">現在設定を保存</button>
             <button id="loadPresetBtn" class="btn btn-secondary" style="flex: 1;" disabled>選択スロットを読込</button>
           </div>
-          <div id="presetStatus" style="font-size: 12px; text-align: center; color: var(--text-secondary); margin-top: 4px;">スロットを選択してください。</div>
-          
+          <div id="presetStatus"
+            style="font-size: 12px; text-align: center; color: var(--text-secondary); margin-top: 4px;">スロットを選択してください。
+          </div>
+
           <!-- 共有コードでエクスポート / インポート -->
-          <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div
+            style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
             <label for="shareCodeInput">共有コードでデザインを共有</label>
             <div class="label-desc">デザインデータをBase64コードで共有・復元できます。</div>
             <div style="display: flex; gap: 8px; margin-top: 4px;">
-              <input type="text" id="shareCodeInput" placeholder="共有コードを貼り付けると自動インポートされます" style="flex: 1; font-size: 12px; font-family: monospace;">
-              <button id="copyShareCodeBtn" class="btn" style="padding: 10px 16px; font-size: 13px; white-space: nowrap;">コードをコピー</button>
+              <input type="text" id="shareCodeInput" placeholder="共有コードをここに貼り付けると自動インポートされます"
+                style="flex: 1; font-size: 12px; font-family: monospace;">
+              <button id="copyShareCodeBtn" class="btn"
+                style="padding: 10px 16px; font-size: 13px; white-space: nowrap;">コードをコピー</button>
             </div>
-            <div id="shareStatus" style="font-size: 12px; text-align: center; color: var(--text-secondary); height: 18px; margin-top: 2px;"></div>
+            <div id="shareStatus"
+              style="font-size: 12px; text-align: center; color: var(--text-secondary); height: 18px; margin-top: 2px;">
+            </div>
           </div>
         </section>
       </div>
@@ -350,6 +364,9 @@
       <p>&copy; 2026 かにみそ王 (MIT License)</p>
     </footer>
   </div>
+
+  <!-- トースト通知コンテナ -->
+  <div id="toastContainer" class="toast-container"></div>
 
   <!-- メインスクリプト -->
   <script src="src/script.js"></script>

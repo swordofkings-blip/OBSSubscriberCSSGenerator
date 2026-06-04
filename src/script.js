@@ -203,6 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
   copyBtn.addEventListener('click', () => {
     cssOutput.select();
     navigator.clipboard.writeText(cssOutput.value).then(() => {
+      showToast('カスタムCSSをコピーしました！', 'success');
       const originalText = copyBtn.textContent;
       copyBtn.textContent = 'コピー完了！';
       copyBtn.style.backgroundColor = '#10b981'; // 成功時の緑色
@@ -212,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 2000); // 2秒間一時的に変更して戻す
     }).catch(err => {
       console.error('コピー失敗: ', err);
+      showToast('コピーに失敗しました。手動でコピーしてください。', 'warning');
     });
   });
 
@@ -407,13 +409,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // プレビューと緑ドット、およびロードボタンの有効化状態を更新
     checkPresetStorage();
     loadPresetBtn.disabled = false;
+    showToast(`スロット ${selectedSlot} に現在のデザインを保存しました！`, 'success');
     const dateStr = new Date(presetData.saveTime).toLocaleString('ja-JP');
-    presetStatus.textContent = `スロット ${selectedSlot} に現在のデザインを保存しました！ (${dateStr})`;
-    presetStatus.style.color = '#10b981'; // 成功時の緑色
-    
-    setTimeout(() => {
-      presetStatus.style.color = '#38bdf8';
-    }, 2000); // 2秒後に状態表示に戻す
+    presetStatus.textContent = `スロット ${selectedSlot} : 保存データあり (${dateStr})`;
+    presetStatus.style.color = '#38bdf8'; // アクティブ青
   });
 
   // 選択中の設定を読み込んでUIに復元
@@ -470,18 +469,14 @@ document.addEventListener('DOMContentLoaded', () => {
       updateValBadges();
       generateCSS();
 
-      presetStatus.textContent = `スロット ${selectedSlot} からデザインをロードしました！`;
-      presetStatus.style.color = '#10b981';
-      
-      setTimeout(() => {
-        const dateStr = new Date(parsed.saveTime).toLocaleString('ja-JP');
-        presetStatus.textContent = `スロット ${selectedSlot} : 保存データあり (${dateStr})`;
-        presetStatus.style.color = '#38bdf8';
-      }, 2000); // 2秒後に状態表示に戻す
+      showToast(`スロット ${selectedSlot} からデザインをロードしました！`, 'success');
+      const dateStr = new Date(parsed.saveTime).toLocaleString('ja-JP');
+      presetStatus.textContent = `スロット ${selectedSlot} : 保存データあり (${dateStr})`;
+      presetStatus.style.color = '#38bdf8';
 
     } catch (e) {
       console.error(e);
-      alert('プリセットの読み込み中にエラーが発生しました。');
+      showToast('プリセットの読み込み中にエラーが発生しました。', 'error');
     }
   });
 
@@ -517,22 +512,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const base64Str = btoa(unescape(encodeURIComponent(jsonStr)));
       
       navigator.clipboard.writeText(base64Str).then(() => {
-        shareStatus.textContent = '共有コードをクリップボードにコピーしました！';
-        shareStatus.style.color = '#10b981'; // 成功時の緑色
-        setTimeout(() => {
-          shareStatus.textContent = '';
-        }, 3000); // 3秒間状態を表示した後にクリア
+        showToast('共有コードをコピーしました！', 'success');
       }).catch(err => {
         // コピー失敗時のフォールバックとして入力欄に表示して手動コピーを促す
         shareCodeInput.value = base64Str;
         shareCodeInput.select();
-        shareStatus.textContent = 'コピーに失敗しました。入力欄から手動でコピーしてください。';
-        shareStatus.style.color = '#f59e0b'; // 警告時のオレンジ色
+        showToast('コピーに失敗しました。入力欄から手動でコピーしてください。', 'warning');
       });
     } catch(e) {
       console.error('共有コード生成エラー:', e);
-      shareStatus.textContent = 'コード生成に失敗しました。';
-      shareStatus.style.color = '#ef4444'; // エラー時の赤色
+      showToast('コード生成に失敗しました。', 'error');
     }
   });
 
@@ -596,18 +585,12 @@ document.addEventListener('DOMContentLoaded', () => {
       updateValBadges();
       generateCSS();
 
-      shareStatus.textContent = 'デザイン設定を正常に読み込みました！';
-      shareStatus.style.color = '#10b981'; // 成功時の緑色
+      showToast('デザイン設定を正常に読み込みました！', 'success');
       shareCodeInput.value = ''; // 読み込み完了後、入力欄をクリア
-
-      setTimeout(() => {
-        shareStatus.textContent = '';
-      }, 3000); // 3秒間状態を表示した後にクリア
 
     } catch (e) {
       console.error('インポートエラー:', e);
-      shareStatus.textContent = '無効な共有コードです。正しいコードを入力してください。';
-      shareStatus.style.color = '#ef4444'; // エラー時の赤色
+      showToast('無効な共有コードです。', 'error');
     }
   });
 
@@ -983,5 +966,40 @@ ${keyframesCss}
     } else {
       previewStyleTag.textContent = '.preview-target { animation: none !important; }';
     }
+  }
+
+  /**
+   * @title トースト通知の表示
+   * @description 画面の右下に一時的な通知メッセージをフワッと表示します。
+   * @param {string} message 表示するメッセージ
+   * @param {string} type 通知のタイプ ('success' | 'error' | 'warning')
+   */
+  function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    // アイコンの選定
+    let icon = '✔️';
+    if (type === 'error') icon = '❌';
+    if (type === 'warning') icon = '⚠️';
+    
+    toast.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-message">${message}</span>`;
+    container.appendChild(toast);
+
+    // フェードインの開始（次のフレームで行うことでブラウザのレンダリング遷移を保障）
+    requestAnimationFrame(() => {
+      toast.classList.add('show');
+    });
+
+    // 3000: トースト通知の視認時間を確保するためのミリ秒数 (3秒)
+    setTimeout(() => {
+      toast.classList.remove('show');
+      toast.addEventListener('transitionend', () => {
+        toast.remove();
+      });
+    }, 3000);
   }
 });
