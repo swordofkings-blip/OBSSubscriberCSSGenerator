@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // DOM要素の取得
   const selectorInput = document.getElementById('selectorInput');
   const previewTextInput = document.getElementById('previewTextInput');
+  const autoUpdateCheckbox = document.getElementById('autoUpdateCheckbox');
 
   // スタイリング用コントロール
   const fontSizeInput = document.getElementById('fontSize');
@@ -102,6 +103,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   previewTextInput.addEventListener('focus', () => {
     stopPreviewTimer();
+  });
+
+  // 自動更新チェックボックスが操作された場合のハンドリング
+  autoUpdateCheckbox.addEventListener('change', () => {
+    if (autoUpdateCheckbox.checked) {
+      // ユーザーが手動でチェックをONにした場合は、お節介タイマー停止フラグをリセットし、即座に次のランダム値を割り当てて開始する
+      isUserEditingPreview = false;
+      const randomVal = generateRandomSubscribers();
+      previewTextInput.value = randomVal;
+      previewTarget.textContent = randomVal;
+      generateCSS();
+      triggerPreviewAnimation();
+      startPreviewTimer();
+    } else {
+      stopPreviewTimer();
+    }
   });
 
   // 色タイプの切り替え制御
@@ -926,7 +943,7 @@ ${visibilitySelectorsStr} {
 /* ターゲット要素のスタイルカスタマイズ */
 ${selector} {
 ${positionCss}
-  transform: ${transformBase} !important;
+  transform: ${transformBase};
   font-size: ${size}px !important;
   font-weight: ${weight} !important;
 ${colorCss}  font-family: ${fontFamily}, sans-serif !important;
@@ -965,7 +982,6 @@ ${keyframesCss}
 
     if (animType !== 'none') {
       const loopText = (mode === 'once') ? '1 forwards' : 'infinite';
-      const previewAnimationCss = `.preview-target { animation: preview-anim-${animType} ${speed}s ease-in-out ${loopText} !important; }`;
       
       let previewKeyframes = '';
       if (animType === 'fade') {
@@ -981,17 +997,23 @@ ${keyframesCss}
         previewKeyframes = `@keyframes preview-anim-neon { 0%, 100% { filter: drop-shadow(0 0 2px ${shadowColor}) ${previewColorStyle.filter !== 'none' ? previewColorStyle.filter : ''}; } 50% { filter: drop-shadow(0 0 10px ${shadowColor}) ${previewColorStyle.filter !== 'none' ? previewColorStyle.filter : ''}; } }`;
       }
       
-      previewStyleTag.textContent = `${previewAnimationCss}\n${previewKeyframes}`;
+      // スタイルタグには @keyframes 定義のみを注入する
+      previewStyleTag.textContent = previewKeyframes;
+
+      // プレビュー要素へインラインスタイルでアニメーションを適用（!important ルールによる競合を防止）
+      previewTarget.style.animation = `preview-anim-${animType} ${speed}s ease-in-out ${loopText}`;
 
       // 「切り替わり時のみ(1回)」が選択されている場合は、コントロール操作時に
       // アニメーションが1回「キュッ」と走るよう、アニメーションを強制再トリガーさせる
       if (mode === 'once') {
         previewTarget.style.animation = 'none';
-        void previewTarget.offsetWidth; // リフローを発生させてアニメーション開始状態をリセット
+        void previewTarget.offsetWidth; // 1: ブラウザのリフローを強制してアニメーションの再適用を有効にするためのダミー読み取り
         previewTarget.style.animation = `preview-anim-${animType} ${speed}s ease-in-out 1 forwards`;
       }
     } else {
-      previewStyleTag.textContent = '.preview-target { animation: none !important; }';
+      // アニメーション無しの場合はインラインスタイルをクリアする
+      previewStyleTag.textContent = '';
+      previewTarget.style.animation = 'none';
     }
   }
 
@@ -1069,6 +1091,9 @@ ${keyframesCss}
    */
   function stopPreviewTimer() {
     isUserEditingPreview = true;
+    if (autoUpdateCheckbox) {
+      autoUpdateCheckbox.checked = false;
+    }
     if (previewTimer) {
       clearInterval(previewTimer);
       previewTimer = null;
