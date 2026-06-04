@@ -64,6 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadPresetBtn = document.getElementById('loadPresetBtn');
   const presetStatus = document.getElementById('presetStatus');
   
+  // 共有コード用要素
+  const shareCodeInput = document.getElementById('shareCodeInput');
+  const copyShareCodeBtn = document.getElementById('copyShareCodeBtn');
+  const shareStatus = document.getElementById('shareStatus');
+  
   let selectedSlot = null; // 選択中のスロット番号 (1〜5)
 
   // Google Fonts 動的インポート用スタイルタグ（プレビュー用）
@@ -477,6 +482,132 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
       console.error(e);
       alert('プリセットの読み込み中にエラーが発生しました。');
+    }
+  });
+
+  // --- デザインデータの共有コード（Base64）エクスポート / インポート機能 ---
+
+  // 現在の設定をBase64にエンコードしてクリップボードにコピー（エクスポート）
+  // タイピング負荷のない静的なデータ変換なので、同期処理で実行します。
+  copyShareCodeBtn.addEventListener('click', () => {
+    const presetData = {
+      selector: selectorInput.value,
+      previewText: previewTextInput.value,
+      fontSize: fontSizeInput.value,
+      fontWeight: fontWeightInput.value,
+      colorType: colorType.value,
+      fontColor: fontColor.value,
+      gradientColorStart: gradientColorStart.value,
+      gradientColorEnd: gradientColorEnd.value,
+      gradientAngle: gradientAngle.value,
+      fontFamily: fontFamilySelect.value,
+      customFont: customFontInput.value,
+      textStrokeWidth: textStrokeWidth.value,
+      textStrokeColor: textStrokeColor.value,
+      align: alignSelect.value,
+      padding: paddingInput.value,
+      animType: animSelect.value,
+      animMode: animMode.value,
+      animSpeed: animSpeed.value
+    };
+
+    try {
+      const jsonStr = JSON.stringify(presetData);
+      // UTF-8文字列を安全にBase64に変換
+      const base64Str = btoa(unescape(encodeURIComponent(jsonStr)));
+      
+      navigator.clipboard.writeText(base64Str).then(() => {
+        shareStatus.textContent = '共有コードをクリップボードにコピーしました！';
+        shareStatus.style.color = '#10b981'; // 成功時の緑色
+        setTimeout(() => {
+          shareStatus.textContent = '';
+        }, 3000); // 3秒間状態を表示した後にクリア
+      }).catch(err => {
+        // コピー失敗時のフォールバックとして入力欄に表示して手動コピーを促す
+        shareCodeInput.value = base64Str;
+        shareCodeInput.select();
+        shareStatus.textContent = 'コピーに失敗しました。入力欄から手動でコピーしてください。';
+        shareStatus.style.color = '#f59e0b'; // 警告時のオレンジ色
+      });
+    } catch(e) {
+      console.error('共有コード生成エラー:', e);
+      shareStatus.textContent = 'コード生成に失敗しました。';
+      shareStatus.style.color = '#ef4444'; // エラー時の赤色
+    }
+  });
+
+  // 貼り付けられた共有コードをデコードしてUIに反映（インポート）
+  // ユーザーが貼り付けた瞬間に反映されるよう、inputイベントで監視
+  shareCodeInput.addEventListener('input', () => {
+    const base64Str = shareCodeInput.value.trim();
+    if (!base64Str) return;
+
+    try {
+      // Base64をデコードし、UTF-8文字列として復元
+      const decodedStr = decodeURIComponent(escape(atob(base64Str)));
+      const parsed = JSON.parse(decodedStr);
+
+      // バリデーション：必要なプロパティがあるかチェック
+      if (!parsed.hasOwnProperty('fontSize') || !parsed.hasOwnProperty('colorType')) {
+        throw new Error('無効な共有コードです。');
+      }
+
+      // 各入力項目へ復元
+      selectorInput.value = parsed.selector || '';
+      previewTextInput.value = parsed.previewText || '25';
+      fontSizeInput.value = parsed.fontSize || '48';
+      fontWeightInput.value = parsed.fontWeight || '700';
+      colorType.value = parsed.colorType || 'solid';
+      fontColor.value = parsed.fontColor || '#ffffff';
+      gradientColorStart.value = parsed.gradientColorStart || '#ec4899';
+      gradientColorEnd.value = parsed.gradientColorEnd || '#3b82f6';
+      gradientAngle.value = parsed.gradientAngle || '135';
+      fontFamilySelect.value = parsed.fontFamily || 'sans-serif';
+      customFontInput.value = parsed.customFont || '';
+      textStrokeWidth.value = parsed.textStrokeWidth || '4';
+      textStrokeColor.value = parsed.textStrokeColor || '#000000';
+      alignSelect.value = parsed.align || 'center';
+      paddingInput.value = parsed.padding || '10';
+      animSelect.value = parsed.animType || 'none';
+      animMode.value = parsed.animMode || 'infinite';
+      animSpeed.value = parsed.animSpeed || '2.0';
+
+      // 16進数カラーテキストの再同期
+      fontColorHex.textContent = fontColor.value;
+      gradStartHex.textContent = gradientColorStart.value;
+      gradEndHex.textContent = gradientColorEnd.value;
+      textStrokeColorHex.textContent = textStrokeColor.value;
+
+      // 色設定エリアの表示・非表示切り替え
+      if (colorType.value === 'solid') {
+        solidColorGroup.style.display = 'block';
+        gradientControls.style.display = 'none';
+        gradientAngleGroup.style.display = 'none';
+      } else {
+        solidColorGroup.style.display = 'none';
+        gradientControls.style.display = 'flex';
+        gradientAngleGroup.style.display = 'block';
+      }
+
+      // プレビュー表示文字の復元
+      previewTarget.textContent = previewTextInput.value;
+
+      // スタイルバッジとCSSの再構築
+      updateValBadges();
+      generateCSS();
+
+      shareStatus.textContent = 'デザイン設定を正常に読み込みました！';
+      shareStatus.style.color = '#10b981'; // 成功時の緑色
+      shareCodeInput.value = ''; // 読み込み完了後、入力欄をクリア
+
+      setTimeout(() => {
+        shareStatus.textContent = '';
+      }, 3000); // 3秒間状態を表示した後にクリア
+
+    } catch (e) {
+      console.error('インポートエラー:', e);
+      shareStatus.textContent = '無効な共有コードです。正しいコードを入力してください。';
+      shareStatus.style.color = '#ef4444'; // エラー時の赤色
     }
   });
 

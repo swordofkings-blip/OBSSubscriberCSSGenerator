@@ -274,8 +274,17 @@
             <button id="savePresetBtn" class="btn" style="flex: 1;">現在設定を保存</button>
             <button id="loadPresetBtn" class="btn btn-secondary" style="flex: 1;" disabled>選択スロットを読込</button>
           </div>
-          <div id="presetStatus"
-            style="font-size: 12px; text-align: center; color: var(--text-secondary); margin-top: 4px;">スロットを選択してください。
+          <div id="presetStatus" style="font-size: 12px; text-align: center; color: var(--text-secondary); margin-top: 4px;">スロットを選択してください。</div>
+          
+          <!-- 共有コードでエクスポート / インポート -->
+          <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <label for="shareCodeInput">共有コードでデザインを共有</label>
+            <div class="label-desc">デザインデータをBase64コードで共有・復元できます。</div>
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <input type="text" id="shareCodeInput" placeholder="共有コードを貼り付けると自動インポートされます" style="flex: 1; font-size: 12px; font-family: monospace;">
+              <button id="copyShareCodeBtn" class="btn" style="padding: 10px 16px; font-size: 13px; white-space: nowrap;">コードをコピー</button>
+            </div>
+            <div id="shareStatus" style="font-size: 12px; text-align: center; color: var(--text-secondary); height: 18px; margin-top: 2px;"></div>
           </div>
         </section>
       </div>
