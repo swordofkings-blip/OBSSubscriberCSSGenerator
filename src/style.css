@@ -1,0 +1,434 @@
+/**
+ * @title OBSチャンネル登録者数カスタムCSSジェネレーター UIスタイル定義 (簡素化リファクタリング版)
+ * @description セレクタコピペ運用に特化した、スリムでモダンなグラスモーフィズムダークテーマを定義します。
+ */
+
+:root {
+  /* カラーシステム */
+  --bg-dark: #090d16;      /* 極めて深い紺黒（メイン背景） */
+  --bg-card: #131b2e;      /* カードやコントロール群の背景 */
+  --bg-input: #1b2640;     /* 入力フィールドの背景 */
+  --border-color: #2a3b61; /* 境界線の色 */
+  --accent-primary: #6366f1; /* インディゴ（プライマリカラー） */
+  --accent-secondary: #ec4899; /* ピンク（アクセントカラー） */
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  --text-primary: #f8fafc; /* メインテキスト */
+  --text-secondary: #94a3b8; /* サブテキスト */
+  --text-active: #38bdf8;   /* アクティブ状態の青 */
+  --shadow-main: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --border-glow: 0 0 15px rgba(99, 102, 241, 0.2);
+
+  /* レイアウト定数 */
+  --border-radius-lg: 16px; /* カード角丸 */
+  --border-radius-md: 8px;  /* 入力欄角丸 */
+}
+
+/* スクロールバーのカスタマイズ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: 'Outfit', 'Inter', 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px;
+  gap: 24px;
+}
+
+/* ヘッダーエリア */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(19, 27, 46, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-main);
+}
+
+.logo-section h1 {
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.logo-section p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* メインコンテンツレイアウト */
+.main-content {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* カード共通スタイル */
+.card {
+  background: rgba(19, 27, 46, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-main);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+}
+
+.card-title .step-num {
+  background: var(--accent-gradient);
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* フォーム要素 */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.label-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: -4px;
+}
+
+input[type="text"],
+select {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--border-radius-md);
+  padding: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+input[type="text"]:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: var(--border-glow);
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* スライダー / カラーピッカー */
+.range-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+input[type="range"] {
+  flex-grow: 1;
+  accent-color: var(--accent-primary);
+}
+
+.range-val {
+  font-family: monospace;
+  font-size: 13px;
+  width: 45px;
+  text-align: right;
+  color: var(--text-secondary);
+}
+
+.color-input-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  user-select: none;
+}
+
+.color-input-container span {
+  text-transform: uppercase;
+}
+
+input[type="color"] {
+  background: none;
+  border: none;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+/* プレビューコンテナ */
+.preview-container {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 背景選択タブ */
+.bg-selector {
+  display: flex;
+  background: var(--bg-card);
+  padding: 4px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+  gap: 4px;
+}
+
+.bg-tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.bg-tab.active {
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+/* プレビュー画面 */
+.preview-screen {
+  position: relative;
+  height: 220px;
+  border-radius: var(--border-radius-lg);
+  border: 2px dashed var(--border-color);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+/* プレビュー背景パターン */
+.bg-transparent-pattern {
+  background-color: #0c0f17;
+  background-image:
+    linear-gradient(45deg, #181d2c 25%, transparent 25%),
+    linear-gradient(-45deg, #181d2c 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #181d2c 75%),
+    linear-gradient(-45deg, transparent 75%, #181d2c 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.bg-black {
+  background: #000000 !important;
+}
+
+.bg-green {
+  background: #00ff00 !important;
+}
+
+.bg-magenta {
+  background: #ff00ff !important;
+}
+
+/* プレビュー表示テキスト */
+.preview-target {
+  font-size: 32px;
+  font-weight: bold;
+  color: #fff;
+  transition: none;
+  white-space: nowrap;
+}
+
+/* 生成されたCSSのアウトプット */
+.css-output-area {
+  position: relative;
+}
+
+.css-output-area textarea {
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 13px;
+  min-height: 260px;
+  background-color: #080c14;
+  color: #38bdf8;
+  line-height: 1.5;
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 12px;
+}
+
+.css-output-area textarea:focus {
+  outline: none;
+}
+
+.copy-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: var(--text-active);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.copy-badge:hover {
+  background-color: var(--accent-primary);
+  color: #fff;
+}
+
+.obs-guide {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background-color: rgba(255, 255, 255, 0.02);
+  border-left: 3px solid var(--accent-primary);
+  padding: 12px;
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.obs-guide ol {
+  padding-left: 16px;
+}
+
+.obs-guide li {
+  margin-bottom: 4px;
+}
+
+.footer {
+  text-align: center;
+  padding: 24px 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-color);
+  margin-top: 24px;
+}
+
+/* プリセット選択スロット用のスタイル */
+.preset-slots {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.slot-btn {
+  flex: 1;
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  padding: 10px !important;
+  border-radius: var(--border-radius-md) !important;
+  font-weight: 700 !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  text-align: center;
+}
+
+.slot-btn:hover {
+  border-color: var(--text-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+.slot-btn.active {
+  background: var(--accent-gradient) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: var(--border-glow) !important;
+}
+
+/* データ保持時のインジケータ（緑のドット） */
+.slot-btn.has-data::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  background-color: #10b981; /* 鮮やかな緑色（データあり） */
+  border-radius: 50%;
+}

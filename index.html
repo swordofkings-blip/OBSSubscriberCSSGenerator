@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OBS チャンネル登録者数カスタムCSSジェネレーター</title>
+
+  <!-- Google Fonts からモダンなフォントをロード -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;700;900&family=Outfit:wght@400;700;900&display=swap"
+    rel="stylesheet">
+
+  <!-- メインスタイルシート -->
+  <link rel="stylesheet" href="src/style.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- ヘッダー -->
+    <header>
+      <div class="logo-section">
+        <h1>OBS SUBSCRIBER CSS GENERATOR</h1>
+        <p>確実＆シンプル！ブラウザの「検証」からセレクタをコピペして作るカスタムCSSジェネレーター</p>
+      </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+
+      <!-- 左カラム: 入力とコントロール -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+
+        <!-- STEP 1: CSSセレクタの指定と手順ガイド -->
+        <section class="card" aria-labelledby="step1-title">
+          <h2 class="card-title" id="step1-title">
+            <span class="step-num">1</span>
+            CSSセレクタの指定
+          </h2>
+
+          <!-- 検証機能のコピー手順説明 -->
+          <div
+            style="background: rgba(99, 102, 241, 0.08); border-left: 4px solid var(--accent-primary); padding: 16px; border-radius: 4px var(--border-radius-md) var(--border-radius-md) 4px; font-size: 13px; line-height: 1.6; color: var(--text-primary);">
+            <strong>👉 セレクタの簡単な取得手順（推奨）：</strong>
+            <ol style="margin-left: 20px; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+              <li>表示したいページ（YouTube Studio等）で、対象の数字（登録者数など）を<strong>右クリック ＞ 「検証」</strong> を選択。</li>
+              <li>デベロッパーツール（HTMLコード画面）で青く選択された行を<strong>右クリック ＞ 「コピー (Copy)」 ＞ 「セレクタをコピー (Copy selector)」</strong>。</li>
+              <li>コピーした内容を下の入力欄に貼り付けます。</li>
+            </ol>
+          </div>
+
+          <div class="form-group">
+            <label for="selectorInput">一意のCSSセレクタ</label>
+            <!-- プレースホルダーには、YouTube Studio で実際に動いたセレクタを例示して分かりやすくする -->
+            <input type="text" id="selectorInput"
+              placeholder="例: #mini-card-header > div:nth-child(5) > div.metric-value.style-scope.yta-latest-activity-card"
+              value="#mini-card-header > div:nth-child(5) > div.metric-value.style-scope.yta-latest-activity-card">
+          </div>
+        </section>
+
+        <!-- STEP 2: スタイルのカスタマイズ -->
+        <section class="card" aria-labelledby="step2-title">
+          <h2 class="card-title" id="step2-title">
+            <span class="step-num">2</span>
+            デザインカスタマイズ
+          </h2>
+
+          <div class="settings-section">
+
+            <!-- プレビュー文字（確認用のダミーテキスト）設定 -->
+            <div class="form-group">
+              <label for="previewTextInput">プレビュー表示文字</label>
+              <div class="label-desc">画面右側のプレビュー枠や、テスト用の文字を変更できます。</div>
+              <input type="text" id="previewTextInput" value="25" placeholder="例: 25 または 1.23万">
+            </div>
+
+            <!-- フォント設定 -->
+            <div class="settings-grid">
+              <div class="form-group">
+                <label for="fontSize">フォントサイズ</label>
+                <div class="range-container">
+                  <!-- value="48": 配信画面で初期状態で視認性の高い48pxをデフォルト値とする -->
+                  <input type="range" id="fontSize" min="16" max="150" step="1" value="48">
+                  <span id="fontSizeVal" class="range-val">48px</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="fontWeight">フォントの太さ</label>
+                <select id="fontWeight"
+                  style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--border-radius-md); padding: 12px; font-family: inherit;">
+                  <option value="400">標準 (400)</option>
+                  <option value="700" selected>太字 (700)</option> <!-- 視認性を考慮してデフォルトで太字(700) -->
+                  <option value="900">極太 (900)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 文字色タイプ・単色設定 -->
+            <div class="settings-grid">
+              <div class="form-group">
+                <label for="colorType">文字色タイプ</label>
+                <select id="colorType"
+                  style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--border-radius-md); padding: 12px; font-family: inherit;">
+                  <option value="solid" selected>単色</option>
+                  <option value="gradient">グラデーション</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="solidColorGroup">
+                <label for="fontColor">文字色</label>
+                <div class="color-input-container">
+                  <input type="color" id="fontColor" value="#ffffff">
+                  <span id="fontColorHex" style="font-family: monospace; font-size: 13px;">#ffffff</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- グラデーション設定コントロール（初期状態非表示） -->
+            <div class="settings-grid" id="gradientControls" style="display: none;">
+              <div class="form-group">
+                <label for="gradientColorStart">開始色</label>
+                <div class="color-input-container">
+                  <!-- 初期値は鮮やかなピンク -->
+                  <input type="color" id="gradientColorStart" value="#ec4899">
+                  <span id="gradStartHex" style="font-family: monospace; font-size: 13px;">#ec4899</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="gradientColorEnd">終了色</label>
+                <div class="color-input-container">
+                  <!-- 初期値は鮮やかなブルー -->
+                  <input type="color" id="gradientColorEnd" value="#3b82f6">
+                  <span id="gradEndHex" style="font-family: monospace; font-size: 13px;">#3b82f6</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" id="gradientAngleGroup" style="display: none;">
+              <label for="gradientAngle">グラデーション角度</label>
+              <div class="range-container">
+                <!-- value="135": 最も自然に見える斜め方向の角度135degをデフォルトとする -->
+                <input type="range" id="gradientAngle" min="0" max="360" step="5" value="135">
+                <span id="gradientAngleVal" class="range-val">135度</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="fontFamily">フォントの種類</label>
+              <select id="fontFamily" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--border-radius-md); padding: 12px; font-family: inherit;">
+                <option value="sans-serif">ゴシック体 (sans-serif)</option>
+                <option value="serif">明朝体 (serif)</option>
+                <option value="'Outfit'">Outfit (英語おすすめ)</option>
+                <option value="custom">Google Fonts またはカスタムフォント</option>
+              </select>
+
+              <!-- Google Fonts 手順ガイド -->
+              <div id="googleFontsGuide" style="display: none; background: rgba(236, 72, 153, 0.08); border-left: 4px solid var(--accent-secondary); padding: 16px; border-radius: 4px var(--border-radius-md) var(--border-radius-md) 4px; font-size: 13px; line-height: 1.6; color: var(--text-primary); margin-top: 12px;">
+                <strong>👉 Google Fonts からフォント名を適用する手順（推奨）：</strong>
+                <ol style="margin-left: 20px; margin-top: 6px; display: flex; flex-direction: column; gap: 6px;">
+                  <li><a href="https://fonts.google.com/?preview.text=1234567890" target="_blank" rel="noopener" style="color: var(--accent-secondary); font-weight: bold; text-decoration: underline;">Google Fonts（外部サイト）</a> を開きます。※「1234567890」が自動入力されたページが開きます。</li>
+                  <li>好みのフォントが見つかったら、そのフォント名（リンクになっている部分）を<strong>右クリック ＞ 「リンクのアドレスをコピー」</strong>します。</li>
+                  <li>コピーしたURLを下の「フォント名またはURLを入力」欄に<strong>そのまま貼り付け（ペースト）</strong>してください。URLから自動的にフォント名（例: <code style="background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 4px; font-family: monospace;">Playfair Display</code>）が抽出されます！</li>
+                </ol>
+              </div>
+
+              <input type="text" id="customFont" placeholder="例: Noto Sans JP または コピーしたURL" style="display: none; margin-top: 8px;">
+            </div>
+
+            <!-- 縁取り（袋文字） -->
+            <div class="settings-grid">
+              <div class="form-group">
+                <label for="textStrokeWidth">文字の縁取りの太さ</label>
+                <div class="range-container">
+                  <!-- value="4": 配信画面で文字が最もくっきり浮き出やすい4pxを初期値とする -->
+                  <input type="range" id="textStrokeWidth" min="0" max="12" step="1" value="4">
+                  <span id="textStrokeWidthVal" class="range-val">4px</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="textStrokeColor">縁取りの色</label>
+                <div class="color-input-container">
+                  <input type="color" id="textStrokeColor" value="#000000">
+                  <span id="textStrokeColorHex" style="font-family: monospace; font-size: 13px;">#000000</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 配置と余白 -->
+            <div class="settings-grid">
+              <div class="form-group">
+                <label for="alignSelect">OBS画面内での配置</label>
+                <select id="alignSelect"
+                  style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--border-radius-md); padding: 12px; font-family: inherit;">
+                  <option value="center" selected>画面中央 (中央揃え)</option>
+                  <option value="top-left">左上</option>
+                  <option value="top-right">右上</option>
+                  <option value="bottom-left">左下</option>
+                  <option value="bottom-right">右下</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="padding">配置の余白 (Padding)</label>
+                <div class="range-container">
+                  <!-- value="10": 四方配置の際の最低限のクリアランス用10px -->
+                  <input type="range" id="padding" min="0" max="100" step="5" value="10">
+                  <span id="paddingVal" class="range-val">10px</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- アニメーション -->
+            <div class="settings-grid">
+              <div class="form-group">
+                <label for="animSelect">アニメーション効果</label>
+                <select id="animSelect"
+                  style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--border-radius-md); padding: 12px; font-family: inherit;">
+                  <option value="none" selected>なし</option>
+                  <option value="fade">フェード（明滅）</option>
+                  <option value="bounce">バウンド（跳ねる）</option>
+                  <option value="pulse">パルス（鼓動）</option>
+                  <option value="neon">ネオン（光る）</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="animMode">再生モード</label>
+                <select id="animMode"
+                  style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--border-radius-md); padding: 12px; font-family: inherit;">
+                  <option value="infinite" selected>無限ループ</option>
+                  <!-- 1回再生：DOM更新のタイミングでトリガーするためのオプション -->
+                  <option value="once">切り替わり時のみ (1回再生)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-grid">
+              <div class="form-group">
+                <label for="animSpeed">アニメーション速度（周期）</label>
+                <div class="range-container">
+                  <!-- value="2.0": 配信画面で邪魔にならない落ち着いた2.0秒周期をデフォルトとする -->
+                  <input type="range" id="animSpeed" min="0.5" max="5.0" step="0.1" value="2.0">
+                  <span id="animSpeedVal" class="range-val">2.0秒</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- デザインの保存・復元 (プリセット) -->
+        <section class="card" aria-labelledby="preset-title">
+          <h2 class="card-title" id="preset-title">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg>
+            デザインの保存・復元
+          </h2>
+          <div class="form-group">
+            <label>セーブスロット (最大5スロット)</label>
+            <div class="preset-slots" style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="slot-btn" data-slot="1">1</button>
+              <button class="slot-btn" data-slot="2">2</button>
+              <button class="slot-btn" data-slot="3">3</button>
+              <button class="slot-btn" data-slot="4">4</button>
+              <button class="slot-btn" data-slot="5">5</button>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px; margin-top: 8px;">
+            <button id="savePresetBtn" class="btn" style="flex: 1;">現在設定を保存</button>
+            <button id="loadPresetBtn" class="btn btn-secondary" style="flex: 1;" disabled>選択スロットを読込</button>
+          </div>
+          <div id="presetStatus"
+            style="font-size: 12px; text-align: center; color: var(--text-secondary); margin-top: 4px;">スロットを選択してください。
+          </div>
+        </section>
+      </div>
+
+      <!-- 右カラム: プレビューと出力CSS -->
+      <div class="preview-container">
+
+        <!-- プレビュー画面 -->
+        <section class="card" aria-labelledby="preview-title">
+          <h2 class="card-title" id="preview-title">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            OBS プレビュー
+          </h2>
+
+          <!-- 背景セレクター -->
+          <div class="bg-selector">
+            <div class="bg-tab active" data-bg="transparent">透過</div>
+            <div class="bg-tab" data-bg="black">黒</div>
+            <div class="bg-tab" data-bg="green">グリーン</div>
+            <div class="bg-tab" data-bg="magenta">マゼンタ</div>
+          </div>
+
+          <!-- プレビュー枠 -->
+          <div id="previewScreen" class="preview-screen bg-transparent-pattern">
+            <div id="previewTarget" class="preview-target">25</div>
+          </div>
+        </section>
+
+        <!-- CSSコード出力 -->
+        <section class="card" aria-labelledby="output-title">
+          <h2 class="card-title" id="output-title">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            生成されたカスタムCSS
+          </h2>
+
+          <div class="css-output-area">
+            <textarea id="cssOutput" readonly></textarea>
+            <div id="copyBtn" class="copy-badge">コピー</div>
+          </div>
+
+          <!-- OBSへの適用ガイド -->
+          <div class="obs-guide">
+            <strong>OBS Studio への適用方法：</strong>
+            <ol>
+              <li>上のテキストエリアからCSSコードを<strong>コピー</strong>します。</li>
+              <li>OBSのソースリストで、対象の<strong>「ブラウザ」ソースをダブルクリック</strong>（または右クリックからプロパティ）します。</li>
+              <li>下部にある<strong>「カスタムCSS」</strong>欄の既存テキストをすべて削除し、コピーしたCSSを貼り付けます。</li>
+              <li>「OK」をクリックすると、チャンネル登録者数だけが切り出され、指定スタイルで表示されます。</li>
+            </ol>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>&copy; 2026 かにみそ王 (MIT License)</p>
+    </footer>
+  </div>
+
+  <!-- メインスクリプト -->
+  <script src="src/script.js"></script>
+</body>
+
+</html>
