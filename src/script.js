@@ -97,6 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
   previewTextInput.addEventListener('input', () => {
     stopPreviewTimer();
     previewTarget.textContent = previewTextInput.value;
+    // 手動入力された文字の反映に合わせてアニメーションを再起動
+    triggerPreviewAnimation();
   });
   previewTextInput.addEventListener('focus', () => {
     stopPreviewTimer();
@@ -483,6 +485,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // スタイルバッジとCSSの再構築
       updateValBadges();
       generateCSS();
+      // 読み込まれた数字とスタイルに合わせてアニメーションを再起動
+      triggerPreviewAnimation();
 
       // ロードされたデザインを固定するため、プレビューの自動更新を停止
       stopPreviewTimer();
@@ -602,6 +606,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // スタイルバッジとCSSの再構築
       updateValBadges();
       generateCSS();
+      // インポートされた数字とスタイルに合わせてアニメーションを再起動
+      triggerPreviewAnimation();
 
       // インポートされたデザインを固定するため、プレビューの自動更新を停止
       stopPreviewTimer();
@@ -1052,6 +1058,8 @@ ${keyframesCss}
       
       // アニメーション等の再適用のためCSS生成を実行する
       generateCSS();
+      // 数字の切り替えに合わせてアニメーションを最初から再生する
+      triggerPreviewAnimation();
     }, 10000);
   }
 
@@ -1065,5 +1073,23 @@ ${keyframesCss}
       clearInterval(previewTimer);
       previewTimer = null;
     }
+  }
+
+  /**
+   * @title プレビューアニメーションの再トリガー
+   * @description 数字が切り替わったタイミングなどで、アニメーションを最初から再再生させるために一時的にアニメーションを解除して再適用します。
+   */
+  function triggerPreviewAnimation() {
+    const animType = animSelect.value;
+    if (animType === 'none') return;
+    
+    const speed = animSpeed.value;
+    const mode = animMode.value;
+    const loopText = (mode === 'once') ? '1 forwards' : 'infinite';
+    
+    // 一時的にアニメーションを解除してリフローを発生させることで、アニメーションを最初からトリガーする
+    previewTarget.style.animation = 'none';
+    void previewTarget.offsetWidth; // 1: ブラウザのリフローを強制してアニメーションの再適用を有効にするためのダミー読み取り
+    previewTarget.style.animation = `preview-anim-${animType} ${speed}s ease-in-out ${loopText}`;
   }
 });
